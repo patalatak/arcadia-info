@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Arcadia Info — Assistance à distance</title>
+<meta name="description" content="Assistance informatique à distance Arcadia, via l'Assistance rapide de Windows 11 ou RustDesk.">
+<link rel="icon" href="favicon.ico" sizes="any">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600;700&family=Source+Sans+3:wght@400;600&display=swap">
+<style>
+:root{
+  --abyss:#17202e;
+  --tide:#202a3e;
+  --cyan:#6ae4ff;
+  --white:#ffffff;
+  --fog:#cdd0d6;
+  --hairline:#000000;
+  --royal:#1b46d8;
+
+  --font:"Open Sans",ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  --data:"Source Sans 3","Open Sans",system-ui,sans-serif;
+
+  --max:1200px;
+  --gutter:clamp(20px,4.5vw,48px);
+  --gap-section:clamp(56px,8vw,80px);
+
+  --r-card:15px;
+  --r-link:8px;
+  --r-pill:80px;
+  --r-input:4px;
+  --r-panel:24px;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+html{scroll-behavior:smooth;}
+body{
+  background:var(--abyss);color:var(--white);
+  font-family:var(--font);font-size:16px;line-height:1.5;letter-spacing:-.036em;
+  -webkit-font-smoothing:antialiased;
+}
+img{max-width:100%;display:block;}
+a{color:inherit;text-decoration:none;}
+.wrap{max-width:var(--max);margin:0 auto;padding-inline:var(--gutter);}
+h1,h2,h3,h4{font-weight:700;line-height:1.2;text-wrap:balance;}
+.t-display{font-size:clamp(40px,6.6vw,80px);line-height:1.05;}
+.t-head{font-size:clamp(26px,3.6vw,36px);}
+.t-sub{font-size:22px;line-height:1.36;}
+.muted{color:var(--fog);font-weight:400;}
+.cyan{color:var(--cyan);}
+
+.btn{display:inline-block;font-family:inherit;font-size:14px;font-weight:600;
+  padding:12px 20px;border-radius:var(--r-pill);border:1px solid transparent;cursor:pointer;
+  transition:background .18s,color .18s;}
+.btn-solid{background:var(--white);color:#000;}
+.btn-solid:hover{background:#dfe6ef;}
+.ghost{display:inline-block;font-size:14px;font-weight:400;color:var(--cyan);
+  border:1px solid var(--cyan);border-radius:var(--r-link);padding:11px 18px;transition:background .18s;}
+.ghost:hover{background:rgba(106,228,255,.09);}
+
+/* Barre supérieure */
+.topbar{background:#1a2638;}
+.topbar .wrap{padding-block:11px;text-align:center;}
+.topbar p{font-size:14px;color:var(--fog);font-weight:400;}
+.topbar a{color:var(--cyan);}
+.topbar a:hover{text-decoration:underline;}
+
+/* Navigation */
+.nav .wrap{display:flex;align-items:center;justify-content:space-between;gap:20px;height:96px;}
+/* Le mot occupe 40% de la hauteur du SVG : 58px de bloc ≈ 23px de lettres. */
+.nav .logo{height:58px;width:auto;}
+.nav .logo:hover{opacity:.85;transition:opacity .18s;}
+.nav .links{display:flex;gap:28px;}
+.nav .links a{font-size:14px;font-weight:400;}
+.nav .links a:hover{color:var(--cyan);}
+@media(max-width:900px){.nav .links{display:none;}}
+
+/* Hero */
+.hero{position:relative;overflow:hidden;}
+.hero::before{
+  content:"";position:absolute;left:50%;top:-420px;transform:translateX(-50%);
+  width:1700px;height:1400px;max-width:230vw;pointer-events:none;
+  background:radial-gradient(ellipse 50% 45% at 50% 42%, rgba(41,138,203,.5) 0%, rgba(27,70,216,.3) 34%, rgba(10,31,122,.14) 58%, rgba(23,32,46,0) 78%);
+}
+.hero .wrap{position:relative;padding-block:clamp(40px,6vw,72px) var(--gap-section);text-align:center;}
+.hero h1{max-width:16ch;margin-inline:auto;}
+.hero .lede{font-size:18px;line-height:1.57;color:var(--fog);font-weight:400;max-width:58ch;margin:22px auto 0;}
+
+/* Choix de l'outil */
+.tools{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:clamp(34px,4.5vw,48px);text-align:left;}
+.tool{background:var(--tide);border:1px solid var(--hairline);border-radius:var(--r-card);padding:26px 24px;display:flex;flex-direction:column;}
+.tool .mark{width:44px;height:44px;border-radius:50%;border:1px solid var(--cyan);color:var(--cyan);
+  display:grid;place-items:center;font-size:20px;font-weight:700;margin-bottom:18px;}
+.tool h3{font-size:20px;font-weight:600;}
+.tool .cat{font-family:var(--data);font-size:12px;letter-spacing:0;color:var(--fog);margin-top:3px;}
+.tool p{color:var(--fog);font-weight:400;font-size:15px;margin-top:14px;flex:1;}
+.tool .act{margin-top:20px;}
+@media(max-width:820px){.tools{grid-template-columns:1fr;}}
+
+section{padding-block:var(--gap-section);}
+.head{max-width:640px;margin-bottom:clamp(30px,4vw,44px);}
+.head p{color:var(--fog);font-weight:400;margin-top:14px;}
+
+/* Étapes */
+.steps{display:grid;grid-template-columns:repeat(3,1fr);gap:24px;}
+.step .n{font-family:var(--data);font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:var(--cyan);}
+.step h3{font-size:20px;font-weight:700;margin-block:12px 10px;}
+.step p{color:var(--fog);font-weight:400;}
+@media(max-width:860px){.steps{grid-template-columns:1fr;}}
+
+/* Ce qu'on dépanne */
+.tiles{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;}
+.tile{background:var(--tide);border:1px solid var(--hairline);border-radius:var(--r-card);padding:24px;}
+.tile h3{font-size:18px;font-weight:700;}
+.tile p{color:var(--fog);font-weight:400;font-size:15px;margin-top:8px;}
+@media(max-width:900px){.tiles{grid-template-columns:1fr 1fr;}}
+@media(max-width:620px){.tiles{grid-template-columns:1fr;}}
+
+/* Sécurité */
+.secu{display:grid;grid-template-columns:1fr 1fr;gap:clamp(28px,5vw,56px);align-items:start;}
+.secu ul{list-style:none;display:flex;flex-direction:column;gap:18px;}
+.secu li{display:grid;grid-template-columns:28px 1fr;gap:14px;}
+.secu li .p{color:var(--cyan);font-size:17px;}
+.secu li b{display:block;font-weight:600;}
+.secu li span{color:var(--fog);font-weight:400;font-size:15px;}
+@media(max-width:860px){.secu{grid-template-columns:1fr;}}
+
+/* Contact */
+.contact-grid{display:grid;grid-template-columns:1fr 1fr;gap:clamp(28px,5vw,56px);}
+.facts{margin-top:24px;}
+.fact{display:grid;grid-template-columns:128px 1fr;gap:14px;padding-block:13px;border-bottom:1px solid rgba(255,255,255,.08);align-items:baseline;}
+.fact dt{font-family:var(--data);font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--fog);}
+.fact dd a:hover{color:var(--cyan);}
+form{background:var(--tide);border:1px solid var(--hairline);border-radius:var(--r-card);padding:clamp(20px,3vw,28px);}
+.field{margin-bottom:16px;}
+.field label{display:block;font-family:var(--data);font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--fog);margin-bottom:7px;}
+.field input,.field textarea{width:100%;font-family:var(--font);font-size:16px;letter-spacing:-.036em;color:var(--white);
+  background:var(--abyss);border:1px solid rgba(255,255,255,.12);border-radius:var(--r-input);padding:12px 14px;}
+.field input::placeholder,.field textarea::placeholder{color:#7b8698;}
+.field input:focus,.field textarea:focus{outline:1px solid var(--cyan);border-color:var(--cyan);}
+.field textarea{min-height:92px;resize:vertical;}
+@media(max-width:900px){.contact-grid{grid-template-columns:1fr;}}
+
+footer{border-top:1px solid rgba(255,255,255,.08);}
+footer .wrap{display:flex;align-items:center;justify-content:space-between;gap:18px;flex-wrap:wrap;padding-block:26px;}
+footer .logo-pied{height:48px;width:auto;opacity:.6;}
+footer span{font-size:14px;color:var(--fog);font-weight:400;}
+footer a:hover{color:var(--cyan);}
+@media(prefers-reduced-motion:reduce){*{transition:none!important;}}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="wrap"><p>Un technicien vous guide par téléphone pendant toute la session — <a href="tel:+33686402477">06 86 40 24 77</a></p></div>
+</div>
+
+<header class="nav">
+  <div class="wrap">
+    <a href="#top" aria-label="Arcadia — accueil"><img class="logo" src="logo-arcadia.svg" alt="Arcadia"></a>
+    <nav class="links">
+      <a href="#demarrer">Démarrer</a>
+      <a href="#etapes">Comment ça marche</a>
+      <a href="#depannage">Ce qu'on dépanne</a>
+      <a href="#securite">Sécurité</a>
+    </nav>
+    <a class="btn btn-solid" href="#contact">Nous contacter</a>
+  </div>
+</header>
+
+<section class="hero" id="top">
+  <div class="wrap">
+    <h1 class="t-display">Votre panne se règle <span class="cyan">à distance</span>.</h1>
+    <p class="lede">Un technicien Arcadia prend la main sur votre ordinateur avec l'outil déjà installé dessus. Pas de logiciel à télécharger, pas de déplacement, pas d'attente.</p>
+
+    <div class="tools" id="demarrer">
+      <article class="tool">
+        <div class="mark">⊞</div>
+        <h3>Assistance rapide Windows 11</h3>
+        <p class="cat">Déjà présente sur votre PC</p>
+        <p>Appuyez sur la touche Windows, tapez « Assistance rapide », ouvrez l'application, puis communiquez-nous le code de sécurité affiché à l'écran.</p>
+        <div class="act"><a class="ghost" href="ms-quick-assist:">Ouvrir l'Assistance rapide →</a></div>
+      </article>
+      <article class="tool">
+        <div class="mark">R</div>
+        <h3>RustDesk</h3>
+        <p class="cat">Windows, macOS, Linux — un seul exécutable</p>
+        <p>Téléchargez et lancez RustDesk, aucune installation requise. Communiquez-nous l'ID à 9 chiffres affiché à l'écran, nous générons le mot de passe de session.</p>
+        <div class="act"><a class="btn btn-solid" href="https://rustdesk.com/" target="_blank" rel="noopener">Télécharger RustDesk</a></div>
+      </article>
+    </div>
+  </div>
+</section>
+
+<section id="etapes">
+  <div class="wrap">
+    <div class="head">
+      <h2 class="t-head">Trois étapes, dix minutes</h2>
+      <p>Le plus souvent, le problème est réglé avant la fin de l'appel.</p>
+    </div>
+    <div class="steps">
+      <div class="step">
+        <p class="n">Étape 01</p>
+        <h3>Vous appelez</h3>
+        <p>Vous décrivez le problème à un technicien, qui détermine s'il se traite à distance.</p>
+      </div>
+      <div class="step">
+        <p class="n">Étape 02</p>
+        <h3>Vous ouvrez l'outil</h3>
+        <p>Assistance rapide ou RustDesk, selon ce dont vous disposez. Vous nous donnez le code affiché.</p>
+      </div>
+      <div class="step">
+        <p class="n">Étape 03</p>
+        <h3>Le dépannage démarre</h3>
+        <p>Le technicien prend la main, vous voyez tout ce qu'il fait, et vous coupez quand vous voulez.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="depannage">
+  <div class="wrap">
+    <div class="head">
+      <h2 class="t-head">Ce qui se répare sans déplacement</h2>
+      <p>La majorité des pannes logicielles n'exigent aucune intervention sur place.</p>
+    </div>
+    <div class="tiles">
+      <div class="tile"><h3>Virus &amp; sécurité</h3><p>Suppression des logiciels malveillants et sécurisation du poste.</p></div>
+      <div class="tile"><h3>Lenteurs &amp; erreurs</h3><p>Nettoyage, optimisation et résolution des erreurs système.</p></div>
+      <div class="tile"><h3>Logiciels</h3><p>Installation, mise à jour et paramétrage de vos applications.</p></div>
+      <div class="tile"><h3>Messagerie</h3><p>Configuration des comptes, récupération d'accès, synchronisation.</p></div>
+      <div class="tile"><h3>Wi-Fi &amp; connexion</h3><p>Diagnostic de la connexion et réglage du réseau domestique.</p></div>
+      <div class="tile"><h3>Prise en main</h3><p>Accompagnement à l'usage de votre matériel ou d'un logiciel.</p></div>
+    </div>
+  </div>
+</section>
+
+<section id="securite">
+  <div class="wrap secu">
+    <div>
+      <h2 class="t-head">La session reste sous votre contrôle</h2>
+      <p class="muted" style="margin-top:14px;">Assistance rapide est déjà présente sur votre matériel. RustDesk s'exécute sans installation, en un seul fichier, et n'est jamais installé de façon permanente sauf si vous le demandez.</p>
+    </div>
+    <ul>
+      <li><span class="p">◉</span><div><b>Code à usage unique</b><span>Chaque session s'ouvre avec un code généré sur le moment, valable une seule fois.</span></div></li>
+      <li><span class="p">◉</span><div><b>Vous voyez tout</b><span>Chaque action du technicien s'affiche en direct sur votre écran.</span></div></li>
+      <li><span class="p">◉</span><div><b>Vous coupez quand vous voulez</b><span>La session s'interrompt d'un clic, à tout moment, de votre côté.</span></div></li>
+    </ul>
+  </div>
+</section>
+
+<section id="contact">
+  <div class="wrap contact-grid">
+    <div>
+      <h2 class="t-head">Pas de code ? Appelez-nous</h2>
+      <p class="muted" style="margin-top:14px;">Le code vous est communiqué par le technicien au début de l'échange. Laissez vos coordonnées, nous vous rappelons.</p>
+      <dl class="facts">
+        <div class="fact"><dt>Téléphone</dt><dd><a href="tel:+33686402477">+33 (0)6 86 40 24 77</a></dd></div>
+        <div class="fact"><dt>Adresse</dt><dd>15 bis rue Paul Rougiers, 83170 Tourves</dd></div>
+        <div class="fact"><dt>Site principal</dt><dd><a href="https://www.arcadia.services">www.arcadia.services</a></dd></div>
+      </dl>
+    </div>
+    <form onsubmit="event.preventDefault(); this.querySelector('button').textContent='Demande enregistrée';">
+      <div class="field"><label for="i-nom">Nom</label><input id="i-nom" type="text" required></div>
+      <div class="field"><label for="i-tel">Téléphone</label><input id="i-tel" type="tel" required></div>
+      <div class="field"><label for="i-msg">Votre problème</label><textarea id="i-msg" placeholder="Lenteurs, virus, messagerie, connexion…"></textarea></div>
+      <button class="btn btn-solid" type="submit" style="width:100%;">Demander un rappel</button>
+    </form>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <img class="logo-pied" src="logo-arcadia.svg" alt="">
+    <span>© 2026 Arcadia — SASU · Tourves (83)</span>
+    <span><a href="tel:+33686402477">06 86 40 24 77</a> · <a href="https://www.arcadia.services">Site principal</a></span>
+  </div>
+</footer>
+
+</body>
+</html>
