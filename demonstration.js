@@ -45,4 +45,10 @@ start.addEventListener('click',async()=>{
  }catch{if(current===generation)status.textContent='Lecture indisponible. Appuyez pour réessayer.'}
  finally{clearTimeout(timeout);if(current===generation)start.disabled=false}
 });
+// Un lien métier ouvre la bonne démonstration, sans lancer la vidéo automatiquement.
+const requestedDemo=new URLSearchParams(location.search).get('demo');
+if(requestedDemo){
+ const matchingButton=Array.from(document.querySelectorAll('[data-demo]')).find(button=>button.dataset.demo===requestedDemo);
+ matchingButton?.click();
+}
 })();
