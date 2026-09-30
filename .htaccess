@@ -4,7 +4,7 @@ RewriteEngine On
 # Conserver la redirection HTTPS déjà utilisée sur l'hébergement OVH.
 RewriteCond %{ENV:HTTPS} !on
 RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI} [R=301,L]
-# Les mêmes adresses permettent de conserver le formulaire de l'aperçu Sites.
+# Les mêmes adresses permettent de conserver le formulaire de préproduction.
 RewriteRule ^api/contact(?:/challenge)?$ api/contact.php [END]
 # Conserver les liens partagés sans extension, comme /demonstration.
 RewriteCond %{REQUEST_FILENAME} !-f
