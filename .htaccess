@@ -1,0 +1,13 @@
+Options -Indexes -MultiViews
+DirectoryIndex index.html
+RewriteEngine On
+# Les mêmes adresses permettent de conserver le formulaire de l'aperçu Sites.
+RewriteRule ^api/contact(?:/challenge)?$ api/contact.php [END]
+# Conserver les liens partagés sans extension, comme /demonstration.
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_FILENAME}.html -f
+RewriteRule ^(.+)$ $1.html [END]
+<FilesMatch "^\.">
+  Require all denied
+</FilesMatch>

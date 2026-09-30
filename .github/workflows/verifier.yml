@@ -1,0 +1,27 @@
+name: Vérifier le paquet OVH
+
+on:
+  push:
+    branches: [preparation-ovh-formulaire]
+  pull_request:
+
+jobs:
+  verifier:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Vérifier le script PHP
+        run: php -l api/contact.php
+      - name: Vérifier les scripts du navigateur
+        run: |
+          node --check contact.js
+          node --check demonstration.js
+          node --check design.js
+      - name: Vérifier les fichiers attendus
+        run: |
+          test -f .htaccess
+          test -f contact.html
+          test -f assets/demo-voix-v1/avocats-voix.mp4
+          test -f assets/demo-voix-v1/architecture-voix.mp4
+          test -f assets/demo-voix-v1/batiment-voix.mp4
+          test -f assets/demo-voix-v1/immobilier-voix.mp4
