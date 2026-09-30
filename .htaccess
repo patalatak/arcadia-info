@@ -1,9 +1,12 @@
 Options -Indexes -MultiViews
 DirectoryIndex index.html
 RewriteEngine On
+# Une seule adresse publique pour éviter les doublons dans les moteurs.
+RewriteCond %{HTTP_HOST} !^www\.arcadiainfo\.com$ [NC]
+RewriteRule ^ https://www.arcadiainfo.com%{REQUEST_URI} [R=301,L]
 # Conserver la redirection HTTPS déjà utilisée sur l'hébergement OVH.
 RewriteCond %{ENV:HTTPS} !on
-RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI} [R=301,L]
+RewriteRule ^ https://www.arcadiainfo.com%{REQUEST_URI} [R=301,L]
 # Les mêmes adresses permettent de conserver le formulaire de préproduction.
 RewriteRule ^api/contact(?:/challenge)?$ api/contact.php [END]
 # Conserver les liens partagés sans extension, comme /demonstration.
