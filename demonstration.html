@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="fr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Démonstrations de stations IA par métier — Arcadia</title><meta name="description" content="Découvrez quatre scénarios illustratifs : recherche dans de gros dossiers, assistant documentaire et organisation pour avocats, architectes, bâtiment et immobilier."><link rel="canonical" href="https://www.arcadiainfo.com/demonstration.html"><meta property="og:type" content="website"><meta property="og:locale" content="fr_FR"><meta property="og:title" content="Démonstrations de stations IA par métier — Arcadia"><meta property="og:description" content="Découvrez quatre scénarios illustratifs : recherche dans de gros dossiers, assistant documentaire et organisation pour avocats, architectes, bâtiment et immobilier."><meta property="og:url" content="https://www.arcadiainfo.com/demonstration.html"><meta name="theme-color" content="#071629"><link rel="icon" href="favicon-arcadia.ico"><link rel="stylesheet" href="design.css"><link rel="stylesheet" href="navy.css"><link rel="stylesheet" href="demo-gallery.css?v=ios-native-2"><script src="design.js" defer></script><script src="demonstration.js?v=ios-native-2" defer></script><link rel="stylesheet" href="refinement.css"></head>
+<html lang="fr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Démonstrations de stations IA par métier — Arcadia</title><meta name="description" content="Découvrez quatre scénarios illustratifs : recherche dans de gros dossiers, assistant documentaire et organisation pour avocats, architectes, bâtiment et immobilier."><link rel="canonical" href="https://www.arcadiainfo.com/demonstration.html"><meta property="og:type" content="website"><meta property="og:locale" content="fr_FR"><meta property="og:title" content="Démonstrations de stations IA par métier — Arcadia"><meta property="og:description" content="Découvrez quatre scénarios illustratifs : recherche dans de gros dossiers, assistant documentaire et organisation pour avocats, architectes, bâtiment et immobilier."><meta property="og:url" content="https://www.arcadiainfo.com/demonstration.html"><meta name="theme-color" content="#071629"><link rel="icon" href="favicon-arcadia.ico"><link rel="stylesheet" href="design.css"><link rel="stylesheet" href="navy.css"><link rel="stylesheet" href="demo-gallery.css?v=html-native-3"><script src="design.js" defer></script><script src="demonstration.js?v=html-native-3" defer></script><link rel="stylesheet" href="refinement.css"></head>
 <body class="info demo-simple"><a class="skip" href="#contenu">Aller au contenu</a><div class="scroll-progress"></div><header class="header"><div class="wrap nav"><a class="brand" href="/" aria-label="Arcadia — accueil"><img class="brand-logo" src="logo-arcadia.svg" width="1339" height="565" alt="Arcadia" fetchpriority="high"></a><nav class="navlinks" id="navigation" aria-label="Navigation principale"><a href="/">Accueil</a><a href="intelligence-artificielle.html">Station IA</a><a href="securite.html">Sécurité</a><a href="assistance.html">Assistance</a><a href="contact.html">Contact</a></nav><a class="demo-access" href="demonstration.html"><span aria-hidden="true">▶</span> Démo</a><button class="menu" aria-controls="navigation" aria-expanded="false">Menu</button></div></header>
 <main id="contenu" class="demo-gallery editorial-gallery wrap">
 <header class="gallery-intro">
@@ -9,13 +9,17 @@
 </header>
 <section class="editorial-layout" aria-label="Démonstrations par métier">
 <div class="editorial-view">
-<div class="demo-player editorial-player" id="gallery-player">
-<video id="demo-video" playsinline preload="none" poster="assets/galerie-editoriale/avocats.png" aria-label="Démonstration pour un cabinet d’avocats, avec voix off française"></video>
-<button id="video-start" class="video-start" type="button" aria-label="Lire la démonstration pour un cabinet d’avocats"><span aria-hidden="true">▶</span></button>
+<div class="demo-player editorial-player is-native" id="gallery-player">
+<video id="demo-video" controls playsinline webkit-playsinline preload="none" poster="assets/galerie-editoriale/avocats.png" aria-label="Démonstration pour un cabinet d’avocats, avec voix off française">
+<source src="assets/demo-apple/avocats/index.m3u8" type="application/vnd.apple.mpegurl">
+<source src="assets/demo-ios/avocats.mp4" type="video/mp4">
+<a href="assets/demo-ios/avocats.mp4">Lire la vidéo Avocats</a>
+</video>
 <p class="stage-cover-label" id="cover-label">Démo · Avocats</p>
 <p id="video-status" class="video-status" role="status"></p>
 </div>
 <p class="demo-caption" id="demo-caption">Retrouvez les pièces utiles dans vos dossiers volumineux.</p>
+<a id="native-video-link" class="textlink native-video-link" href="assets/demo-ios/avocats.mp4" target="_blank" rel="noopener">Ouvrir la vidéo en plein écran</a>
 <div class="gallery-utilities">
 <a class="textlink" id="demo-project-link" href="contact.html?metier=avocats#contact">Étudier cet usage pour mon entreprise</a>
 <button type="button" id="chat-toggle" class="chat-toggle" aria-expanded="false" aria-controls="chat-panel">Explorer cet exemple</button>

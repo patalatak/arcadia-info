@@ -1,5 +1,7 @@
 Options -Indexes -MultiViews
 DirectoryIndex index.html
+AddType application/vnd.apple.mpegurl .m3u8
+AddType video/mp2t .ts
 RewriteEngine On
 # Une seule adresse publique pour éviter les doublons dans les moteurs.
 RewriteCond %{HTTP_HOST} !^www\.arcadiainfo\.com$ [NC]

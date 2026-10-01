@@ -1,15 +1,14 @@
 (() => {
 'use strict';
-const video=document.getElementById('demo-video'),start=document.getElementById('video-start'),status=document.getElementById('video-status'),player=document.getElementById('gallery-player');
+const video=document.getElementById('demo-video'),status=document.getElementById('video-status'),player=document.getElementById('gallery-player');
 const choices=Array.from(document.querySelectorAll('[data-demo]')),coverLabel=document.getElementById('cover-label');
-const nativePlayer=/iPhone|iPad|iPod/.test(navigator.userAgent)||(navigator.platform==='MacIntel'&&navigator.maxTouchPoints>1);
+// Le navigateur choisit son format natif ; aucune détection fragile de l’appareil.
+const useHls=Boolean(video.canPlayType('application/vnd.apple.mpegurl'));
+const appleVideos={avocats:'assets/demo-apple/avocats/index.m3u8',architecture:'assets/demo-apple/architecture/index.m3u8',batiment:'assets/demo-apple/batiment/index.m3u8',immobilier:'assets/demo-apple/immobilier/index.m3u8'};
 const iphoneVideos={avocats:'assets/demo-ios/avocats.mp4',architecture:'assets/demo-ios/architecture.mp4',batiment:'assets/demo-ios/batiment.mp4',immobilier:'assets/demo-ios/immobilier.mp4'};
-const nativeLink=document.createElement('a');
-nativeLink.className='textlink native-video-link';nativeLink.textContent='Ouvrir la vidéo en plein écran';nativeLink.target='_blank';nativeLink.rel='noopener';nativeLink.hidden=!nativePlayer;
-document.getElementById('demo-caption').insertAdjacentElement('afterend',nativeLink);
-player.classList.toggle('is-native',nativePlayer);
+const nativeLink=document.getElementById('native-video-link');
 const chatToggle=document.getElementById('chat-toggle'),chatPanel=document.getElementById('chat-panel'),chatQuestions=document.getElementById('chat-questions'),chatExchange=document.getElementById('chat-exchange');
-let active,generation=0,resumeVideo=false;
+let active,resumeVideo=false,fallbackAttempted=false;
 const examples={
  avocats:[['Que change la version n° 3 ?','Dans le dossier fictif Durand / Atlas, une demande de réparation est ajoutée au dispositif, page 18. La version n° 2 ne la comportait pas. Le courrier de résiliation doit être obtenu et relu.'],['Quelle est la suite de cet échange ?','L’avocat demande le courrier complet à Monsieur Durand. Celui-ci le transmet dans le même dossier ; l’avocat retrouve sa réponse et ouvre la pièce avant de préparer ses conclusions.'],['Quelle action rejoint le planning ?','Le professionnel valide un créneau mercredi 17 juin, de 14 h à 16 h, pour préparer les conclusions. Le rappel de 13 h 30 est simulé. L’avocat reprend ensuite le brouillon, vérifie ses sources et partage un point d’avancement au client, sans transmettre ses notes internes. Aucun délai juridique n’est calculé.']],
  architecture:[['Quel changement faut-il étudier ?','Le compte rendu du 12 juin, page 2, demande un bureau à la place d’une chambre et le maintien de la terrasse. Le programme précédent mentionnait encore une chambre.'],['Quelle précision apporte le client ?','Madame Martin précise : une personne, deux jours par semaine, avec des appels nécessitant du calme. Ces informations complètent le programme ; elles ne valident pas la faisabilité.'],['Quelle action rejoint le planning ?','Après lecture des précisions, l’architecte valide un créneau mercredi de 14 h à 16 h pour étudier la variante bureau. La réunion client du jeudi était déjà présente. L’architecte relit ensuite la note de variante et partage le programme au client pour confirmation des besoins, sans validation automatique de faisabilité.']],
@@ -24,46 +23,29 @@ function configureChat(slug){
  for(const [question,answer] of examples[slug]||[]){const button=document.createElement('button');button.type='button';button.className='chat-question';button.textContent=question;button.addEventListener('click',()=>{const q=document.createElement('p'),a=document.createElement('p');q.className='chat-user';q.textContent=question;a.className='chat-answer';a.textContent=answer;chatExchange.replaceChildren(q,a)});chatQuestions.append(button)}
 }
 function stop(){
- generation++;video.pause();video.removeAttribute('src');video.load();
+ video.pause();
  player.classList.remove('is-playing');player.removeAttribute('aria-busy');
 }
 function selectDemo(button){
  stop();active=button;choices.forEach(choice=>{const selected=choice===button;choice.classList.toggle('is-active',selected);choice.setAttribute('aria-pressed',String(selected))});
  video.poster=button.dataset.poster;video.setAttribute('aria-label','Démonstration : '+button.dataset.title+', avec voix off française');
- start.setAttribute('aria-label','Lire la démonstration : '+button.dataset.title);start.hidden=nativePlayer;start.disabled=false;video.controls=nativePlayer;status.textContent='';coverLabel.textContent='Démo · '+button.dataset.label;
- if(nativePlayer){
-  // Sur iPhone, seul le bouton natif Apple déclenche la lecture : aucun play() automatique.
-  video.src=iphoneVideos[button.dataset.demo];video.preload='none';video.load();nativeLink.href=iphoneVideos[button.dataset.demo];
- }
+ video.controls=true;status.textContent='';coverLabel.textContent='Démo · '+button.dataset.label;fallbackAttempted=false;
+ // Une seule affectation au changement de métier, sans retrait de source ni lecture forcée.
+ const source=useHls?appleVideos[button.dataset.demo]:iphoneVideos[button.dataset.demo];
+ if(video.getAttribute('src')!==source){video.src=source;video.load();}
+ nativeLink.href=iphoneVideos[button.dataset.demo];
  document.getElementById('demo-project-link').href='contact.html?metier='+encodeURIComponent(button.dataset.demo)+'#contact';
  document.getElementById('demo-caption').textContent=button.dataset.caption;
  document.getElementById('demo-meta').textContent=button.dataset.duration+' · Avec voix off · Vous pouvez couper le son dans le lecteur.';
  configureChat(button.dataset.demo);
 }
-async function playDemo(){
- if(nativePlayer)return;
- const current=generation;start.disabled=true;status.textContent='Chargement de la vidéo…';player.setAttribute('aria-busy','true');
- try{
-  // Safari doit recevoir play() directement pendant le clic, sans attendre fetch().
-  // L’URL directe laisse le navigateur charger et parcourir la vidéo progressivement.
-  if(video.getAttribute('src')!==active.dataset.video)video.src=active.dataset.video;
-  video.controls=true;
-  if(chatPanel.hidden)await video.play();else resumeVideo=true;
-  if(current!==generation)return;start.hidden=true;status.textContent='';player.classList.add('is-playing');
- }catch(error){
-  if(current!==generation)return;
-  if(error.name==='NotAllowedError'){
-   // Si le navigateur impose son propre bouton, ne pas le masquer par notre pastille.
-   start.hidden=true;player.classList.add('is-playing');status.textContent='Appuyez sur le bouton de lecture du lecteur.';
-  }else status.textContent='Lecture indisponible. Appuyez sur ▶ pour réessayer.';
- }
- finally{if(current===generation){start.disabled=false;player.removeAttribute('aria-busy')}}
-}
-// Choisir un métier affiche sa couverture ; seul le bouton de lecture lance la vidéo.
+// Le bouton HTML natif gère la lecture, le son et le plein écran sur tous les appareils.
 choices.forEach(button=>button.addEventListener('click',()=>selectDemo(button)));
-start.addEventListener('click',playDemo);
-video.addEventListener('playing',()=>{start.hidden=true;status.textContent='';player.classList.add('is-playing');player.removeAttribute('aria-busy')});
-video.addEventListener('error',()=>{if(nativePlayer)status.textContent='Utilisez « Ouvrir la vidéo en plein écran » ci-dessous.'});
+video.addEventListener('playing',()=>{status.textContent='';player.classList.add('is-playing')});
+video.addEventListener('error',()=>{
+ if(useHls&&!fallbackAttempted&&active){fallbackAttempted=true;video.src=iphoneVideos[active.dataset.demo];video.load();status.textContent='Appuyez sur lecture pour utiliser la version MP4.';}
+ else status.textContent='Utilisez « Ouvrir la vidéo en plein écran » ci-dessous.';
+});
 chatToggle.addEventListener('click',()=>{if(!chatPanel.hidden){closeChat();return}resumeVideo=!video.paused;video.pause();chatPanel.hidden=false;chatToggle.setAttribute('aria-expanded','true');document.getElementById('chat-reduce').focus()});
 document.getElementById('chat-reduce').addEventListener('click',()=>{closeChat();chatToggle.focus()});
 chatPanel.addEventListener('keydown',e=>{if(e.key==='Escape'){e.preventDefault();closeChat();chatToggle.focus()}});
