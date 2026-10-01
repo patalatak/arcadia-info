@@ -2,6 +2,12 @@
 'use strict';
 const video=document.getElementById('demo-video'),start=document.getElementById('video-start'),status=document.getElementById('video-status'),player=document.getElementById('gallery-player');
 const choices=Array.from(document.querySelectorAll('[data-demo]')),coverLabel=document.getElementById('cover-label');
+const nativePlayer=/iPhone|iPad|iPod/.test(navigator.userAgent)||(navigator.platform==='MacIntel'&&navigator.maxTouchPoints>1);
+const iphoneVideos={avocats:'assets/demo-ios/avocats.mp4',architecture:'assets/demo-ios/architecture.mp4',batiment:'assets/demo-ios/batiment.mp4',immobilier:'assets/demo-ios/immobilier.mp4'};
+const nativeLink=document.createElement('a');
+nativeLink.className='textlink native-video-link';nativeLink.textContent='Ouvrir la vidéo en plein écran';nativeLink.target='_blank';nativeLink.rel='noopener';nativeLink.hidden=!nativePlayer;
+document.getElementById('demo-caption').insertAdjacentElement('afterend',nativeLink);
+player.classList.toggle('is-native',nativePlayer);
 const chatToggle=document.getElementById('chat-toggle'),chatPanel=document.getElementById('chat-panel'),chatQuestions=document.getElementById('chat-questions'),chatExchange=document.getElementById('chat-exchange');
 let active,generation=0,resumeVideo=false;
 const examples={
@@ -24,13 +30,18 @@ function stop(){
 function selectDemo(button){
  stop();active=button;choices.forEach(choice=>{const selected=choice===button;choice.classList.toggle('is-active',selected);choice.setAttribute('aria-pressed',String(selected))});
  video.poster=button.dataset.poster;video.setAttribute('aria-label','Démonstration : '+button.dataset.title+', avec voix off française');
- start.setAttribute('aria-label','Lire la démonstration : '+button.dataset.title);start.hidden=false;start.disabled=false;video.controls=false;status.textContent='';coverLabel.textContent='Démo · '+button.dataset.label;
+ start.setAttribute('aria-label','Lire la démonstration : '+button.dataset.title);start.hidden=nativePlayer;start.disabled=false;video.controls=nativePlayer;status.textContent='';coverLabel.textContent='Démo · '+button.dataset.label;
+ if(nativePlayer){
+  // Sur iPhone, seul le bouton natif Apple déclenche la lecture : aucun play() automatique.
+  video.src=iphoneVideos[button.dataset.demo];video.preload='none';video.load();nativeLink.href=iphoneVideos[button.dataset.demo];
+ }
  document.getElementById('demo-project-link').href='contact.html?metier='+encodeURIComponent(button.dataset.demo)+'#contact';
  document.getElementById('demo-caption').textContent=button.dataset.caption;
  document.getElementById('demo-meta').textContent=button.dataset.duration+' · Avec voix off · Vous pouvez couper le son dans le lecteur.';
  configureChat(button.dataset.demo);
 }
 async function playDemo(){
+ if(nativePlayer)return;
  const current=generation;start.disabled=true;status.textContent='Chargement de la vidéo…';player.setAttribute('aria-busy','true');
  try{
   // Safari doit recevoir play() directement pendant le clic, sans attendre fetch().
@@ -51,6 +62,8 @@ async function playDemo(){
 // Choisir un métier affiche sa couverture ; seul le bouton de lecture lance la vidéo.
 choices.forEach(button=>button.addEventListener('click',()=>selectDemo(button)));
 start.addEventListener('click',playDemo);
+video.addEventListener('playing',()=>{start.hidden=true;status.textContent='';player.classList.add('is-playing');player.removeAttribute('aria-busy')});
+video.addEventListener('error',()=>{if(nativePlayer)status.textContent='Utilisez « Ouvrir la vidéo en plein écran » ci-dessous.'});
 chatToggle.addEventListener('click',()=>{if(!chatPanel.hidden){closeChat();return}resumeVideo=!video.paused;video.pause();chatPanel.hidden=false;chatToggle.setAttribute('aria-expanded','true');document.getElementById('chat-reduce').focus()});
 document.getElementById('chat-reduce').addEventListener('click',()=>{closeChat();chatToggle.focus()});
 chatPanel.addEventListener('keydown',e=>{if(e.key==='Escape'){e.preventDefault();closeChat();chatToggle.focus()}});
