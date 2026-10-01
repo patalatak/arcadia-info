@@ -3,7 +3,7 @@
 const video=document.getElementById('demo-video'),start=document.getElementById('video-start'),status=document.getElementById('video-status'),player=document.getElementById('gallery-player');
 const choices=Array.from(document.querySelectorAll('[data-demo]')),coverLabel=document.getElementById('cover-label');
 const chatToggle=document.getElementById('chat-toggle'),chatPanel=document.getElementById('chat-panel'),chatQuestions=document.getElementById('chat-questions'),chatExchange=document.getElementById('chat-exchange');
-let active,objectUrl='',controller,generation=0,resumeVideo=false;
+let active,generation=0,resumeVideo=false;
 const examples={
  avocats:[['Que change la version n° 3 ?','Dans le dossier fictif Durand / Atlas, une demande de réparation est ajoutée au dispositif, page 18. La version n° 2 ne la comportait pas. Le courrier de résiliation doit être obtenu et relu.'],['Quelle est la suite de cet échange ?','L’avocat demande le courrier complet à Monsieur Durand. Celui-ci le transmet dans le même dossier ; l’avocat retrouve sa réponse et ouvre la pièce avant de préparer ses conclusions.'],['Quelle action rejoint le planning ?','Le professionnel valide un créneau mercredi 17 juin, de 14 h à 16 h, pour préparer les conclusions. Le rappel de 13 h 30 est simulé. L’avocat reprend ensuite le brouillon, vérifie ses sources et partage un point d’avancement au client, sans transmettre ses notes internes. Aucun délai juridique n’est calculé.']],
  architecture:[['Quel changement faut-il étudier ?','Le compte rendu du 12 juin, page 2, demande un bureau à la place d’une chambre et le maintien de la terrasse. Le programme précédent mentionnait encore une chambre.'],['Quelle précision apporte le client ?','Madame Martin précise : une personne, deux jours par semaine, avec des appels nécessitant du calme. Ces informations complètent le programme ; elles ne valident pas la faisabilité.'],['Quelle action rejoint le planning ?','Après lecture des précisions, l’architecte valide un créneau mercredi de 14 h à 16 h pour étudier la variante bureau. La réunion client du jeudi était déjà présente. L’architecte relit ensuite la note de variante et partage le programme au client pour confirmation des besoins, sans validation automatique de faisabilité.']],
@@ -18,8 +18,8 @@ function configureChat(slug){
  for(const [question,answer] of examples[slug]||[]){const button=document.createElement('button');button.type='button';button.className='chat-question';button.textContent=question;button.addEventListener('click',()=>{const q=document.createElement('p'),a=document.createElement('p');q.className='chat-user';q.textContent=question;a.className='chat-answer';a.textContent=answer;chatExchange.replaceChildren(q,a)});chatQuestions.append(button)}
 }
 function stop(){
- generation++;controller?.abort();video.pause();video.removeAttribute('src');video.load();
- if(objectUrl)URL.revokeObjectURL(objectUrl);objectUrl='';player.classList.remove('is-playing');player.removeAttribute('aria-busy');
+ generation++;video.pause();video.removeAttribute('src');video.load();
+ player.classList.remove('is-playing');player.removeAttribute('aria-busy');
 }
 function selectDemo(button){
  stop();active=button;choices.forEach(choice=>{const selected=choice===button;choice.classList.toggle('is-active',selected);choice.setAttribute('aria-pressed',String(selected))});
@@ -31,17 +31,22 @@ function selectDemo(button){
  configureChat(button.dataset.demo);
 }
 async function playDemo(){
- const current=generation;start.disabled=true;status.textContent='Chargement de la vidéo…';player.setAttribute('aria-busy','true');controller=new AbortController();
- const request=controller,timeout=setTimeout(()=>request.abort(),30000);
+ const current=generation;start.disabled=true;status.textContent='Chargement de la vidéo…';player.setAttribute('aria-busy','true');
  try{
-  // Le chargement en mémoire permet aussi de parcourir la vidéo dans l’aperçu.
-  const response=await fetch(active.dataset.video,{signal:request.signal});if(!response.ok)throw new Error('Vidéo indisponible');
-  const blob=await response.blob();if(current!==generation)return;
-  if(objectUrl)URL.revokeObjectURL(objectUrl);objectUrl=URL.createObjectURL(blob);video.src=objectUrl;video.controls=true;
+  // Safari doit recevoir play() directement pendant le clic, sans attendre fetch().
+  // L’URL directe laisse le navigateur charger et parcourir la vidéo progressivement.
+  if(video.getAttribute('src')!==active.dataset.video)video.src=active.dataset.video;
+  video.controls=true;
   if(chatPanel.hidden)await video.play();else resumeVideo=true;
   if(current!==generation)return;start.hidden=true;status.textContent='';player.classList.add('is-playing');
- }catch{if(current===generation)status.textContent='Lecture indisponible. Appuyez sur ▶ pour réessayer.'}
- finally{clearTimeout(timeout);if(current===generation){start.disabled=false;player.removeAttribute('aria-busy')}}
+ }catch(error){
+  if(current!==generation)return;
+  if(error.name==='NotAllowedError'){
+   // Si le navigateur impose son propre bouton, ne pas le masquer par notre pastille.
+   start.hidden=true;player.classList.add('is-playing');status.textContent='Appuyez sur le bouton de lecture du lecteur.';
+  }else status.textContent='Lecture indisponible. Appuyez sur ▶ pour réessayer.';
+ }
+ finally{if(current===generation){start.disabled=false;player.removeAttribute('aria-busy')}}
 }
 // Choisir un métier affiche sa couverture ; seul le bouton de lecture lance la vidéo.
 choices.forEach(button=>button.addEventListener('click',()=>selectDemo(button)));
